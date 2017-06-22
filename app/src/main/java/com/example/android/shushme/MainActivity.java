@@ -16,12 +16,14 @@ package com.example.android.shushme;
 * limitations under the License.
 */
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity  implements
     }
 
     public void onLocationPermissionClicked(View view) {
+        ActivityCompat.requestPermissions(this,
+                new String[] Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
     // TODO (8) Implement onLocationPermissionClicked to handle the CheckBox click event
