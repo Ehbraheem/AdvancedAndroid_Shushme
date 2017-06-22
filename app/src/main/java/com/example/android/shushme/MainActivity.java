@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
         Log.i(TAG, "API Client Connection Successful!");
-        refreshPlacesDate();
+        refreshPlacesData();
     }
 
     /***
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.e(TAG, "API Client Connection Failed!");
     }
 
-    public void refreshPlacesDate() {
+    public void refreshPlacesData() {
         Uri uri = PlaceContract.PlaceEntry.CONTENT_URI;
         Cursor data = getContentResolver().query(
                 uri,
@@ -214,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements
             ContentValues contentValues = new ContentValues();
             contentValues.put(PlaceContract.PlaceEntry.COLUMN_PLACE_ID, placeID);
             getContentResolver().insert(PlaceContract.PlaceEntry.CONTENT_URI, contentValues);
+
+            refreshPlacesData();
         }
     }
 
