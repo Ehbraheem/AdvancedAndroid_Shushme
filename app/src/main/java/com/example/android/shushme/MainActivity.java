@@ -19,6 +19,7 @@ package com.example.android.shushme;
 import android.Manifest;
 import android.app.LoaderManager;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +30,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity  implements
 
     // Constants
     public static final String TAG = MainActivity.class.getSimpleName();
+    private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
 
     // Member variables
     private PlaceListAdapter mAdapter;
@@ -111,14 +114,23 @@ public class MainActivity extends AppCompatActivity  implements
     @Override
     protected void onResume() {
         super.onResume();
-    }
 
-    public void onLocationPermissionClicked(View view) {
-        ActivityCompat.requestPermissions(this,
-                new String[] Manifest.permission.ACCESS_FINE_LOCATION);
+        CheckBox locationPermissions = (CheckBox) findViewById(R.id.location_permission_checkbox);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            locationPermissions.setChecked(false);
+        } else {
+            locationPermissions.setChecked(true);
+            locationPermissions.setEnabled(false);
+        }
     }
 
     // TODO (8) Implement onLocationPermissionClicked to handle the CheckBox click event
+    public void onLocationPermissionClicked(View view) {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                PERMISSIONS_REQUEST_FINE_LOCATION);
+    }
     // TODO (9) Implement the Add Place Button click event to show  a toast message with the permission status
 
 }
