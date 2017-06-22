@@ -31,6 +31,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -132,5 +133,13 @@ public class MainActivity extends AppCompatActivity  implements
                 PERMISSIONS_REQUEST_FINE_LOCATION);
     }
     // TODO (9) Implement the Add Place Button click event to show  a toast message with the permission status
+    public void onAddPlaceButtonClicked(View view) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "You need to enable location permissions first", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(this, "Location Permission Granted", Toast.LENGTH_LONG).show();
+    }
 
 }
