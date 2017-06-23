@@ -2,9 +2,16 @@ package com.example.android.shushme;
 
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 
@@ -15,15 +22,17 @@ import java.util.List;
  * Created by prof.BOLA on 6/22/2017.
  */
 
-public class Geofencing {
+public class Geofencing implements ResultCallback {
 
     private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private List<Geofence> mGeofenceList;
     private PendingIntent mGeofencPendingIntent;
 
+    public static final String TAG = Geofencing.class.getSimpleName();
+
     private static final int GEOFENCE_RADIUS= 50;
-    public static final int GEOFENCE_TIMEOUT = 30;
+    public static final int GEOFENCE_TIMEOUT = 24 * 60 * 60 * 1000;
 
     public Geofencing(Context context, GoogleApiClient client) {
         mContext = context;
@@ -50,5 +59,60 @@ public class Geofencing {
             mGeofenceList.add(geofence);
 
         }
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(mGeofenceList);
+        return builder.build();
+    }
+
+    public void registerAllGeofences() {
+        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected() ||
+                mGeofenceList == null || mGeofenceList.size() == 0) {
+            return;
+        }
+
+        try {
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    getGeofencingRequest(),
+                    getGeofencePendingIntent()
+            ).setResultCallback(this);
+        } catch (SecurityException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    public void unRegisterAllGeofences() {
+        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+            return;
+        }
+        try {
+            LocationServices.GeofencingApi.removeGeofences(
+                    mGoogleApiClient,
+                    getGeofencePendingIntent()
+            ).setResultCallback(this);
+        } catch (SecurityException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        if (mGeofencPendingIntent != null) {
+            return mGeofencPendingIntent;
+        }
+        Intent intent = new Intent(mContext, GeofenceBroadcasstReceiver.class);
+        mGeofencPendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        return mGeofencPendingIntent;
+    }
+
+    @Override
+    public void onResult(@NonNull Result result) {
+        Log.e(TAG, String.format("Error adding/removing geofence : %s",
+                result.getStatus().toString()));
     }
 }
